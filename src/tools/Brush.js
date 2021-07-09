@@ -9,22 +9,26 @@ export default class Brush extends Tool {
         this.canvas.onmousemove = this.mouseMoveHandler.bind(this);
         this.canvas.onmousedown = this.mouseDownHandler.bind(this);
         this.canvas.onmouseup = this.mouseUpHandler.bind(this);
+        this.canvas.addEventListener("touchstart", this.mouseDownHandler.bind(this), false);
+        this.canvas.addEventListener("touchend", this.mouseUpHandler.bind(this), false);
+        this.canvas.addEventListener("touchmove", this.mouseMoveHandler.bind(this), false);
     }
     mouseUpHandler(e) {
         this.mouseDown = false;
     }
     mouseMoveHandler(e) {
         if (this.mouseDown) {
-            this.draw( e.pageX - e.target.offsetLeft, e.pageY - e.target.offsetTop);
+            e.preventDefault();
+            this.draw(e.pageX - e.target.offsetLeft, e.pageY - e.target.offsetTop);
         }
     }
     mouseDownHandler(e) {
         this.mouseDown = true;
         this.ctx.beginPath();
-        this.ctx.moveTo( e.pageX - e.target.offsetLeft, e.pageY - e.target.offsetTop);
+        this.ctx.moveTo(e.pageX - e.target.offsetLeft, e.pageY - e.target.offsetTop);
     }
     draw(x, y) {
-        this.ctx.lineTo(x,y);
+        this.ctx.lineTo(x, y);
         this.ctx.stroke();
         console.log('draw');
     }
