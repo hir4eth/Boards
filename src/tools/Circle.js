@@ -1,8 +1,8 @@
 import Tool from './Tool';
 
 export class Circle extends Tool {
-    constructor(canvas) {
-        super(canvas);
+    constructor(canvas, socket, id) {
+        super(canvas, socket, id);
         this.listen();
     }
     listen() {
@@ -12,15 +12,28 @@ export class Circle extends Tool {
     }
     mouseUpHandler(e) {
         this.mouseDown = false;
+        this.socket.send(JSON.stringify({
+            method: 'draw',
+            id: this.id,
+            figure: {
+                type: 'circle',
+                x: this.startX,
+                y: this.startY,
+                r: this.r,
+                fillColor: this.ctx.fillStyle,
+                strokeColor: this.ctx.strokeStyle,
+                lineWidth: this.ctx.lineWidth
+            }
+        }))
     }
     mouseMoveHandler(e) {
         if (this.mouseDown) {
             let currentX = e.pageX - e.target.offsetLeft;
             let currentY = e.pageY - e.target.offsetTop;
-            let width = currentX - this.startX;
-            let height = currentY - this.startY;
-            e.preventDefault();
-            this.draw(this.startX, this.startY, width, height);
+            this.width = currentX - this.startX;
+            this.height = currentY - this.startY;
+            this.r = Math.sqrt(this.width ** 2 + this.height ** 2)
+            this.draw(this.startX, this.startY, this.r);
         }
     }
     mouseDownHandler(e) {
@@ -30,17 +43,26 @@ export class Circle extends Tool {
         this.startY = e.pageY - e.target.offsetTop;
         this.saved = this.canvas.toDataURL();
     }
-    draw(x, y, w, h) {
+    draw(x, y, r) {
         const img = new Image();
         img.src = this.saved;
         img.onload = () => {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
             this.ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
             this.ctx.beginPath();
-            this.ctx.arc(x, y, Math.abs(w), 0, 2 * Math.PI, false);
+            this.ctx.arc(x, y, r, 0, 2 * Math.PI, false);
             this.ctx.fill();
             this.ctx.stroke();
         }
 
+    }
+    static staticDraw(ctx, fillColor, strokeColor, lineWidth, x, y, r) {
+        ctx.fillStyle = fillColor;
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = lineWidth;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
     }
 }

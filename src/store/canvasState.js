@@ -2,10 +2,22 @@ import { makeAutoObservable } from "mobx";
 
 class CanvasState {
     canvas = null;
+    socket = null;
+    sessionId = null;
     undoList = [];
     redoList = [];
+    username = "";
     constructor() {
         makeAutoObservable(this);
+    }
+    setSocket(socket) {
+        this.socket = socket;
+    }
+    setSessionId(sessionId) {
+        this.sessionId = sessionId;
+    }
+    setUsername(username) {
+        this.username = username;
     }
     setCanvas(canvas) {
         this.canvas = canvas;
@@ -27,8 +39,7 @@ class CanvasState {
                 ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
             }
-        }
-        else {
+        } else {
             ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         }
     }
